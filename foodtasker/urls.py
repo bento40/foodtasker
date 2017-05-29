@@ -22,10 +22,13 @@ urlpatterns = [
         name = 'restaurant-sign-up'),
     url(r'^restaurant/$', views.restaurant_home, name = 'restaurant-home'),
 
-    url(r'^restaurant/account/$', views.restaurant_account, name = 'restaurant_account'),
-    url(r'^restaurant/meal/$', views.restaurant_meal, name = 'restaurant_meal'),
-    url(r'^restaurant/order/$', views.restaurant_order, name = 'restaurant_order'),
-    url(r'^restaurant/report/$', views.restaurant_report, name = 'restaurant_report'),
+    url(r'^restaurant/account/$', views.restaurant_account, name = 'restaurant-account'),
+    url(r'^restaurant/meal/$', views.restaurant_meal, name = 'restaurant-meal'),
+    url(r'^restaurant/meal/add/$', views.restaurant_add_meal, name = 'restaurant_add_meal'),
+    url(r'^restaurant/meal/edit/(?P<meal_id>\d+)$', views.restaurant_edit_meal, name = 'restaurant-edit-meal'),
+
+    url(r'^restaurant/order/$', views.restaurant_order, name = 'restaurant-order'),
+    url(r'^restaurant/report/$', views.restaurant_report, name = 'restaurant-report'),
 
     # Sign In/ Sign Up/ Sign Out
     url(r'^api/social/', include('rest_framework_social_oauth2.urls')),

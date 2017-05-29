@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from foodtaskerapp.forms import UserForm, RestaurantForm, UserFormForEdit
+from foodtaskerapp.forms import UserForm, RestaurantForm, UserFormForEdit, MealForm
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
+from foodtaskerapp.models import Meal, Order
 
 
 # Create your views here.
@@ -33,7 +34,40 @@ def restaurant_account(request):
 
 @login_required(login_url='/restaurant/sign-in/')
 def restaurant_meal(request):
-    return render(request, 'restaurant/meal.html',{})
+    meals = Meal.objects.filter(restaurant = request.user.restaurant).order_by("-id")
+    return render(request, 'restaurant/meal.html',{"meals":meals})
+
+@login_required(login_url='/restaurant/sign-in/')
+def restaurant_add_meal(request):
+    form = MealForm()
+
+    if request.method == "POST":
+        form = MealForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            meal = form.save(commit=False)
+            meal.restaurant = request.user.restaurant
+            meal.save()
+            return redirect(restaurant_meal)
+
+    return render(request, 'restaurant/add_meal.html',{
+        "form": form
+    })
+
+@login_required(login_url='/restaurant/sign-in/')
+def restaurant_edit_meal(request, meal_id):
+    form = MealForm(instance = Meal.objects.get(id = meal_id))
+
+    if request.method == "POST":
+        form = MealForm(request.POST, request.FILES, instance = Meal.objects.get(id = meal_id))
+
+        if form.is_valid():
+            form.save()
+            return redirect(restaurant_meal)
+
+    return render(request, 'restaurant/edit_meal.html',{
+        "form": form
+    })
 
 @login_required(login_url='/restaurant/sign-in/')
 def restaurant_order(request):
@@ -41,7 +75,8 @@ def restaurant_order(request):
 
 @login_required(login_url='/restaurant/sign-in/')
 def restaurant_report(request):
-    return render(request, 'restaurant/report.html',{})
+    orders = Order.objects.filter(restaurant = request.user.restaurant).order_by("-id")
+    return render(request, 'restaurant/report.html',{"orders": orders})
 
 def restaurant_sign_up(request):
     user_form = UserForm()
